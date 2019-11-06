@@ -11,7 +11,7 @@ v3.x.x
 - Making kara cloud-able.
 
 ## 1. Start
-** Using GOPATH **
+**Using GOPATH**
 ```go
 cd ${GOPATH}/src
 git clone https://github.com/fwhezfwhez/kara.git
@@ -26,7 +26,7 @@ cd ${GOPATH}/src/kara/karad
 karad -httpPort :8080 -grpcPort :8081
 ```
 
-** Using GOMODULE **
+**Using GOMODULE**
 ```go
 git clone https://github.com/fwhezfwhez/kara.git
 cd kara/karad
