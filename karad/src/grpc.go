@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/fwhezfwhez/errorx"
-	"kara"
+	"github.com/fwhezfwhez/kara"
 )
 
 type JobService struct{}
@@ -18,8 +18,15 @@ func (js *JobService) SingleTimesJob(ctx context.Context, req *SingleTimesJobReq
 		req.SpotId = req.Key
 	}
 
-	spot, _ := kara.KaraPool.LoadOrStore(req.SpotId, kara.NewSpot())
-	ok, e := spot.(*kara.KaraSpot).SetWhenNotExist(req.Key)
+	spt, _ := kara.KaraPool.LoadOrStore(req.SpotId, kara.NewSpot())
+	spot := spt.(*kara.KaraSpot)
+	if spot.Type != 1 {
+		return &SingleTimesJobResponse{
+			Status:  false,
+			Message: fmt.Sprintf("spot_id '%s' is not times-type, got type %d", req.SpotId, spot.Type),
+		}, nil
+	}
+	ok, e := spot.SetWhenNotExist(req.Key)
 	if e != nil {
 		return nil, e
 	}
@@ -42,8 +49,15 @@ func (js *JobService) MultipleTimesJob(ctx context.Context, req *MultipleTimesJo
 		req.SpotId = req.Key
 	}
 
-	spot, _ := kara.KaraPool.LoadOrStore(req.SpotId, kara.NewTimesSpot(int(req.Limit)))
-	ok, e := spot.(*kara.KaraSpot).AddWhenNotReachedLimit(req.Key)
+	spt, _ := kara.KaraPool.LoadOrStore(req.SpotId, kara.NewTimesSpot(int(req.Limit)))
+	spot := spt.(*kara.KaraSpot)
+	if spot.Type != 2 {
+		return &MultipleTimesJobResponse{
+			Status: false,
+			Message: fmt.Sprintf("spot_id '%s' is not times-type, got type %d", req.SpotId, spot.Type),
+		}, nil
+	}
+	ok, e := spot.AddWhenNotReachedLimit(req.Key)
 	if e != nil {
 		return nil, errorx.Wrap(e)
 	}

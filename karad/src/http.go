@@ -2,8 +2,8 @@ package src
 
 import (
 	"fmt"
+	"github.com/fwhezfwhez/kara"
 	"github.com/gin-gonic/gin"
-	"kara"
 )
 
 func SingleJob(c *gin.Context) {
@@ -26,8 +26,14 @@ func SingleJob(c *gin.Context) {
 	if param.SpotID == "" {
 		param.SpotID = param.Key
 	}
-	spot, _ := kara.KaraPool.LoadOrStore(param.SpotID, kara.NewSpot())
-	ok, e := spot.(*kara.KaraSpot).SetWhenNotExist(param.Key)
+	spt, _ := kara.KaraPool.LoadOrStore(param.SpotID, kara.NewSpot())
+	spot :=spt.(*kara.KaraSpot)
+	if spot.Type != 1 {
+		c.JSON(400,gin.H{"message": fmt.Sprintf("spot_id '%s' is not exist-type, got type %d", param.SpotID, spot.Type)})
+		return
+	}
+
+	ok, e := spot.SetWhenNotExist(param.Key)
 	if e != nil {
 		c.JSON(400, Result{ok, e.Error()})
 		return
@@ -56,8 +62,13 @@ func MultipleJob(c *gin.Context) {
 		param.SpotID = param.Key
 	}
 
-	spot, _ := kara.KaraPool.LoadOrStore(param.SpotID, kara.NewTimesSpot(param.Limit))
-	ok, e := spot.(*kara.KaraSpot).AddWhenNotReachedLimit(param.Key)
+	spt, _ := kara.KaraPool.LoadOrStore(param.SpotID, kara.NewTimesSpot(param.Limit))
+	spot := spt.(*kara.KaraSpot)
+	if spot.Type != 2 {
+		c.JSON(400,gin.H{"message": fmt.Sprintf("spot_id '%s' is not times-type, got type %d", param.SpotID, spot.Type)})
+		return
+	}
+	ok, e := spot.AddWhenNotReachedLimit(param.Key)
 	if e != nil {
 		c.JSON(400, Result{ok, e.Error()})
 		return

@@ -3,10 +3,11 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/fwhezfwhez/kara"
+	"github.com/fwhezfwhez/kara/karad/src"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/cors"
 	"google.golang.org/grpc"
-	"kara/karad/src"
 	"net"
 	"net/http"
 	"os"
@@ -16,9 +17,13 @@ import (
 var httpPort string
 var grpcPort string
 
+var (
+	version = kara.Version
+)
+
 const (
-	version = "v1.0.0"
-	help    = `
+	help = `
+# Kara
 karad -httpPort disable                         # will not start http server
 karad -grpcPort disable                         # will not start grpc server
 karad version                                   # will print its version
@@ -30,20 +35,22 @@ func main() {
 	flag.StringVar(&httpPort, "httpPort", ":8080", "kara -httpPort :8080")
 	flag.StringVar(&grpcPort, "grpcPort", ":8081", "kara -grpcPort :8081")
 	flag.Parse()
-
+	fmt.Println(os.Args)
 	args := os.Args
-	switch args[0] {
-	case "version", "--version":
-		fmt.Println(version)
-		return
-	case "help":
-		fmt.Println(help)
-		return
-	case "cli":
-		if args[1] == "ping" {
-			fmt.Println("pong")
+	if len(args) > 1 {
+		switch args[1] {
+		case "version", "--version":
+			fmt.Println(version)
+			return
+		case "help":
+			fmt.Println(help)
+			return
+		case "cli":
+			if args[1] == "ping" {
+				//ping()
+			}
+			return
 		}
-		return
 	}
 
 	if httpPort != "" && httpPort != "disable" {
@@ -52,11 +59,13 @@ func main() {
 	if grpcPort != "" && grpcPort != "disable" {
 		go karaGrpc()
 	}
-
+	fmt.Println(kara.GetLogo(httpPort, grpcPort))
 	select {}
 }
 func karaHttp() {
-	r := gin.Default()
+	gin.SetMode(gin.ReleaseMode)
+	r := gin.New()
+	r.Use(gin.Recovery())
 	r.POST("/kara/single/", src.SingleJob)
 	r.POST("/kara/multiple/", src.MultipleJob)
 	s := &http.Server{
@@ -80,6 +89,5 @@ func karaGrpc() {
 	go func() {
 		s.Serve(lis)
 	}()
-	fmt.Println(s.GetServiceInfo())
 	select {}
 }

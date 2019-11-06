@@ -5,6 +5,10 @@ import (
 	"sync"
 )
 
+const (
+	Version = "v1.0.1"
+)
+
 var (
 	KaraPool sync.Map
 )
