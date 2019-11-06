@@ -17,7 +17,7 @@ const (
 type KaraSpot struct {
 	Map map[string]int
 
-	// 1- if-Exist, 2- times increase
+	// 1- if exist, 2- times increment
 	// When Type=1, karaSpot.Map will has its value ranged [1,2], 1-Not Exist, 2-Exist
 	// When Type=2, karaSpot.Map will has its value ranged [0,1,2,3...]
 	Type int

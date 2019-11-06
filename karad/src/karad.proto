@@ -1,0 +1,28 @@
+// How to generate karad.proto to go file:
+//   protoc --go_out=plugins=grpc:. karad.proto
+syntax = "proto3";
+package src;
+
+message SingleTimesJobRequest {
+  string spot_id= 1;
+  string key = 2;
+}
+message SingleTimesJobResponse{
+    bool status = 1;
+    string message= 2;
+}
+
+message MultipleTimesJobRequest {
+  string spot_id= 1;
+  string key = 2;
+  int32 limit =3;
+}
+message MultipleTimesJobResponse{
+    bool status = 1;
+    string message= 2;
+}
+
+service JobService {
+  rpc SingleTimesJob(SingleTimesJobRequest) returns (SingleTimesJobResponse){}
+  rpc MultipleTimesJob(MultipleTimesJobRequest) returns (MultipleTimesJobResponse){}
+}
