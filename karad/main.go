@@ -35,7 +35,7 @@ func main() {
 	flag.StringVar(&httpPort, "httpPort", ":8080", "kara -httpPort :8080")
 	flag.StringVar(&grpcPort, "grpcPort", ":8081", "kara -grpcPort :8081")
 	flag.Parse()
-	fmt.Println(os.Args)
+	// fmt.Println(os.Args)
 	args := os.Args
 	if len(args) > 1 {
 		switch args[1] {
